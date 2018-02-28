@@ -8,8 +8,8 @@ module.exports = function (server, config) {
     io.sockets.on('connection', function (client) {
         client.resources = {
             screen: false,
-            video: true,
-            audio: false
+            video: false,
+            audio: true
         };
 
         // pass a message to another id
@@ -51,8 +51,8 @@ module.exports = function (server, config) {
             // sanity check
             if (typeof name !== 'string') return;
             // check if maximum number of clients reached
-            if (config.rooms && config.rooms.maxClients > 0 &&
-                clientsInRoom(name) >= config.rooms.maxClients) {
+            console.log(clientsInRoom(name))
+            if (config.rooms && config.rooms.maxClients > 0 && clientsInRoom(name) >= config.rooms.maxClients) {
                 safeCb(cb)('full');
                 return;
             }
@@ -137,7 +137,12 @@ module.exports = function (server, config) {
     }
 
     function clientsInRoom(name) {
-        return io.sockets.clients(name).length;
+        var _clients = io.nsps['/'].adapter.rooms[name]||{};
+        var clientsCount = 0;
+        for (var socketId in _clients) {
+            clientsCount++;
+        }
+        return clientsCount;
     }
 
 };
